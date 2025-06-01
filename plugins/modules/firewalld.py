@@ -132,6 +132,18 @@ options:
     choices: [ default, ACCEPT, DROP, "%%REJECT%%" ]
     type: str
     version_added: 1.2.0
+  egress_priority:
+    description:
+      - The egress priority of the zone, may only be used when permanent=true.
+      - Requires FirewallD >= 2.0.0.
+    type: int
+    version_added: 3.0.0
+  ingress_priority:
+    description:
+      - The ingress priority of the zone, may only be used when permanent=true.
+      - Requires FirewallD >= 2.0.0.
+    type: int
+    version_added: 3.0.0
 notes:
   - Not tested on any Debian based system.
   - Requires the python2 bindings of firewalld, which may not be installed by default.
@@ -870,6 +882,106 @@ class ForwardPortTransaction(FirewallTransaction):
         self.update_fw_settings(fw_zone, fw_settings)
 
 
+class EgressTransaction(FirewallTransaction):
+    """
+    EgressTransaction
+    """
+
+    def __init__(self, module, action_args=None, zone=None, desired_state=None, permanent=False, immediate=False):
+        super(EgressTransaction, self).__init__(
+            module, action_args=action_args, desired_state=desired_state, zone=zone, permanent=permanent, immediate=immediate
+        )
+
+        self.enabled_msg = "Set zone %s priority to %d" % \
+            (self.zone, self.action_args[0])
+
+        self.disabled_msg = "Set zone %s priority to %d" % \
+            (self.zone, self.action_args[0])
+
+    def get_enabled_immediate(self, priority):
+        if priority == self.fw.getZoneSettings(self.zone).getEgressPriority():
+            return True
+        else:
+            return False
+
+    def get_enabled_permanent(self, priority):
+        fw_zone, fw_settings = self.get_fw_zone_settings()
+        if priority == fw_settings.getEgressPriority():
+            return True
+        else:
+            return False
+
+    def set_enabled_immediate(self, priority):
+        self.module.fail_json(
+            msg='ERROR: can only set egress priority permanently'
+        )
+
+    def set_enabled_permanent(self, priority):
+        fw_zone, fw_settings = self.get_fw_zone_settings()
+        fw_settings.setEgressPriority(priority)
+        self.update_fw_settings(fw_zone, fw_settings)
+
+    def set_disabled_immediate(self, priority):
+        self.module.fail_json(
+            msg='ERROR: can only set egress priority permanently'
+        )
+
+    def set_disabled_permanent(self, priority):
+        fw_zone, fw_settings = self.get_fw_zone_settings()
+        fw_settings.setEgressPriority(priority)
+        self.update_fw_settings(fw_zone, fw_settings)
+
+
+class IngressTransaction(FirewallTransaction):
+    """
+    IngressTransaction
+    """
+
+    def __init__(self, module, action_args=None, zone=None, desired_state=None, permanent=False, immediate=False):
+        super(IngressTransaction, self).__init__(
+            module, action_args=action_args, desired_state=desired_state, zone=zone, permanent=permanent, immediate=immediate
+        )
+
+        self.enabled_msg = "Set zone %s priority to %d" % \
+            (self.zone, self.action_args[0])
+
+        self.disabled_msg = "Set zone %s priority to %d" % \
+            (self.zone, self.action_args[0])
+
+    def get_enabled_immediate(self, priority):
+        if priority == self.fw.getZoneSettings(self.zone).getIngressPriority():
+            return True
+        else:
+            return False
+
+    def get_enabled_permanent(self, priority):
+        fw_zone, fw_settings = self.get_fw_zone_settings()
+        if priority == fw_settings.getIngressPriority():
+            return True
+        else:
+            return False
+
+    def set_enabled_immediate(self, priority):
+        self.module.fail_json(
+            msg='ERROR: can only set ingress priority permanently'
+        )
+
+    def set_enabled_permanent(self, priority):
+        fw_zone, fw_settings = self.get_fw_zone_settings()
+        fw_settings.setIngressPriority(priority)
+        self.update_fw_settings(fw_zone, fw_settings)
+
+    def set_disabled_immediate(self, priority):
+        self.module.fail_json(
+            msg='ERROR: can only set ingress priority permanently'
+        )
+
+    def set_disabled_permanent(self, priority):
+        fw_zone, fw_settings = self.get_fw_zone_settings()
+        fw_settings.setIngressPriority(priority)
+        self.update_fw_settings(fw_zone, fw_settings)
+
+
 def main():
 
     module = AnsibleModule(
@@ -892,6 +1004,8 @@ def main():
             masquerade=dict(type='bool'),
             offline=dict(type='bool', default=False),
             target=dict(type='str', choices=['default', 'ACCEPT', 'DROP', '%%REJECT%%']),
+            egress_priority=dict(type='int'),
+            ingress_priority=dict(type='int'),
         ),
         supports_check_mode=True,
         required_by=dict(
@@ -939,6 +1053,8 @@ def main():
     msgs = []
     icmp_block = module.params['icmp_block']
     icmp_block_inversion = module.params['icmp_block_inversion']
+    egress_priority = module.params['egress_priority']
+    ingress_priority = module.params['ingress_priority']
     service = module.params['service']
     protocol = module.params['protocol']
     rich_rule = module.params['rich_rule']
@@ -1165,6 +1281,34 @@ def main():
         transaction = ZoneTargetTransaction(
             module,
             action_args=(target,),
+            zone=zone,
+            desired_state=desired_state,
+            permanent=permanent,
+            immediate=immediate,
+        )
+
+        changed, transaction_msgs = transaction.run()
+        msgs = msgs + transaction_msgs
+
+    if egress_priority is not None:
+
+        transaction = EgressTransaction(
+            module,
+            action_args=(egress_priority,),
+            zone=zone,
+            desired_state=desired_state,
+            permanent=permanent,
+            immediate=immediate,
+        )
+
+        changed, transaction_msgs = transaction.run()
+        msgs = msgs + transaction_msgs
+
+    if ingress_priority is not None:
+
+        transaction = IngressTransaction(
+            module,
+            action_args=(ingress_priority,),
             zone=zone,
             desired_state=desired_state,
             permanent=permanent,
