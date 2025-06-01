@@ -302,6 +302,14 @@ def get_zone_rich_rules(zone_settings):
     return zone_settings.getRichRules()
 
 
+def get_zone_egress_priority(zone_settings):
+    return zone_settings.getEgressPriority()
+
+
+def get_zone_ingress_priority(zone_settings):
+    return zone_settings.getIngressPriority()
+
+
 def main():
     module_args = dict(
         active_zones=dict(required=False, type='bool', default=False),
@@ -383,6 +391,11 @@ def main():
             # The 'forward' parameter supports on python-firewall 0.9.0(or later).
             if StrictVersion(firewalld_info['version']) >= StrictVersion('0.9.0'):
                 zone_info['forward'] = get_zone_forward(zone_settings)
+
+            # Zone priorities are only supported in FirewallD 2.0.0.
+            if StrictVersion(firewalld_info['version']) >= StrictVersion('2.0.0'):
+                zone_info['egress_priority'] = get_zone_egress_priority(zone_settings)
+                zone_info['ingress_priority'] = get_zone_ingress_priority(zone_settings)
 
             zones_info[zone] = zone_info
         firewalld_info['zones'] = zones_info
