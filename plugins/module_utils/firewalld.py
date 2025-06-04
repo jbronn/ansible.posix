@@ -137,7 +137,7 @@ class FirewallTransaction(object):
 
         return (fw_zone, fw_settings)
 
-    def update_fw_settings(self, fw_zone, fw_settings):
+    def update_fw_zone_settings(self, fw_zone, fw_settings):
         if self.fw_offline:
             self.fw.config.set_zone_config(fw_zone, fw_settings.settings)
         else:

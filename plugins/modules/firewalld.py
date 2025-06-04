@@ -308,7 +308,7 @@ class IcmpBlockTransaction(FirewallTransaction):
     def set_enabled_permanent(self, icmp_block, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.addIcmpBlock(icmp_block)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self, icmp_block, timeout):
         self.fw.removeIcmpBlock(self.zone, icmp_block)
@@ -316,7 +316,7 @@ class IcmpBlockTransaction(FirewallTransaction):
     def set_disabled_permanent(self, icmp_block, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.removeIcmpBlock(icmp_block)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class IcmpBlockInversionTransaction(FirewallTransaction):
@@ -348,7 +348,7 @@ class IcmpBlockInversionTransaction(FirewallTransaction):
     def set_enabled_permanent(self):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setIcmpBlockInversion(True)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self):
         self.fw.removeIcmpBlockInversion(self.zone)
@@ -356,7 +356,7 @@ class IcmpBlockInversionTransaction(FirewallTransaction):
     def set_disabled_permanent(self):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setIcmpBlockInversion(False)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class ServiceTransaction(FirewallTransaction):
@@ -389,7 +389,7 @@ class ServiceTransaction(FirewallTransaction):
     def set_enabled_permanent(self, service, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.addService(service)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self, service, timeout):
         self.fw.removeService(self.zone, service)
@@ -397,7 +397,7 @@ class ServiceTransaction(FirewallTransaction):
     def set_disabled_permanent(self, service, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.removeService(service)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class ProtocolTransaction(FirewallTransaction):
@@ -430,7 +430,7 @@ class ProtocolTransaction(FirewallTransaction):
     def set_enabled_permanent(self, protocol, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.addProtocol(protocol)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self, protocol, timeout):
         self.fw.removeProtocol(self.zone, protocol)
@@ -438,7 +438,7 @@ class ProtocolTransaction(FirewallTransaction):
     def set_disabled_permanent(self, protocol, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.removeProtocol(protocol)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class ForwardTransaction(FirewallTransaction):
@@ -473,7 +473,7 @@ class ForwardTransaction(FirewallTransaction):
     def set_enabled_permanent(self):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setForward(True)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self):
         self.fw.removeForward(self.zone)
@@ -481,7 +481,7 @@ class ForwardTransaction(FirewallTransaction):
     def set_disabled_permanent(self):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setForward(False)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class MasqueradeTransaction(FirewallTransaction):
@@ -516,7 +516,7 @@ class MasqueradeTransaction(FirewallTransaction):
     def set_enabled_permanent(self):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setMasquerade(True)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self):
         self.fw.removeMasquerade(self.zone)
@@ -524,7 +524,7 @@ class MasqueradeTransaction(FirewallTransaction):
     def set_disabled_permanent(self):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setMasquerade(False)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class PortTransaction(FirewallTransaction):
@@ -553,7 +553,7 @@ class PortTransaction(FirewallTransaction):
     def set_enabled_permanent(self, port, protocol, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.addPort(port, protocol)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self, port, protocol, timeout):
         self.fw.removePort(self.zone, port, protocol)
@@ -561,7 +561,7 @@ class PortTransaction(FirewallTransaction):
     def set_disabled_permanent(self, port, protocol, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.removePort(port, protocol)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class InterfaceTransaction(FirewallTransaction):
@@ -648,7 +648,7 @@ class InterfaceTransaction(FirewallTransaction):
     def set_disabled_permanent(self, interface):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.removeInterface(interface)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class RichRuleTransaction(FirewallTransaction):
@@ -686,7 +686,7 @@ class RichRuleTransaction(FirewallTransaction):
     def set_enabled_permanent(self, rule, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.addRichRule(rule)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self, rule, timeout):
         self.fw.removeRichRule(self.zone, rule)
@@ -694,7 +694,7 @@ class RichRuleTransaction(FirewallTransaction):
     def set_disabled_permanent(self, rule, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.removeRichRule(rule)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class SourceTransaction(FirewallTransaction):
@@ -732,7 +732,7 @@ class SourceTransaction(FirewallTransaction):
     def set_enabled_permanent(self, source):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.addSource(source)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self, source):
         self.fw.removeSource(self.zone, source)
@@ -740,7 +740,7 @@ class SourceTransaction(FirewallTransaction):
     def set_disabled_permanent(self, source):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.removeSource(source)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class ZoneTargetTransaction(FirewallTransaction):
@@ -779,7 +779,7 @@ class ZoneTargetTransaction(FirewallTransaction):
     def set_enabled_permanent(self, target):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setTarget(target)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self, target):
         self.module.fail_json(msg=self.tx_not_permanent_error_msg)
@@ -787,7 +787,7 @@ class ZoneTargetTransaction(FirewallTransaction):
     def set_disabled_permanent(self, target):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setTarget("default")
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class ZoneTransaction(FirewallTransaction):
@@ -871,7 +871,7 @@ class ForwardPortTransaction(FirewallTransaction):
     def set_enabled_permanent(self, port, proto, toport, toaddr, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.addForwardPort(port, proto, toport, toaddr)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self, port, proto, toport, toaddr, timeout):
         self.fw.removeForwardPort(self.zone, port, proto, toport, toaddr)
@@ -879,7 +879,7 @@ class ForwardPortTransaction(FirewallTransaction):
     def set_disabled_permanent(self, port, proto, toport, toaddr, timeout):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.removeForwardPort(port, proto, toport, toaddr)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class EgressTransaction(FirewallTransaction):
@@ -892,10 +892,10 @@ class EgressTransaction(FirewallTransaction):
             module, action_args=action_args, desired_state=desired_state, zone=zone, permanent=permanent, immediate=immediate
         )
 
-        self.enabled_msg = "Set zone %s priority to %d" % \
+        self.enabled_msg = "Set zone %s egress priority to %d" % \
             (self.zone, self.action_args[0])
 
-        self.disabled_msg = "Set zone %s priority to %d" % \
+        self.disabled_msg = "Set zone %s egress priority to %d" % \
             (self.zone, self.action_args[0])
 
     def get_enabled_immediate(self, priority):
@@ -919,7 +919,7 @@ class EgressTransaction(FirewallTransaction):
     def set_enabled_permanent(self, priority):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setEgressPriority(priority)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self, priority):
         self.module.fail_json(
@@ -929,7 +929,7 @@ class EgressTransaction(FirewallTransaction):
     def set_disabled_permanent(self, priority):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setEgressPriority(priority)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 class IngressTransaction(FirewallTransaction):
@@ -942,10 +942,10 @@ class IngressTransaction(FirewallTransaction):
             module, action_args=action_args, desired_state=desired_state, zone=zone, permanent=permanent, immediate=immediate
         )
 
-        self.enabled_msg = "Set zone %s priority to %d" % \
+        self.enabled_msg = "Set zone %s ingress priority to %d" % \
             (self.zone, self.action_args[0])
 
-        self.disabled_msg = "Set zone %s priority to %d" % \
+        self.disabled_msg = "Set zone %s ingress priority to %d" % \
             (self.zone, self.action_args[0])
 
     def get_enabled_immediate(self, priority):
@@ -969,7 +969,7 @@ class IngressTransaction(FirewallTransaction):
     def set_enabled_permanent(self, priority):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setIngressPriority(priority)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
     def set_disabled_immediate(self, priority):
         self.module.fail_json(
@@ -979,7 +979,7 @@ class IngressTransaction(FirewallTransaction):
     def set_disabled_permanent(self, priority):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setIngressPriority(priority)
-        self.update_fw_settings(fw_zone, fw_settings)
+        self.update_fw_zone_settings(fw_zone, fw_settings)
 
 
 def main():
@@ -1012,6 +1012,8 @@ def main():
             interface=('zone',),
             target=('zone',),
             source=('permanent',),
+            egress_priority=('permanent',),
+            ingress_priority=('permanent',),
         ),
         mutually_exclusive=[
             ['icmp_block', 'icmp_block_inversion', 'service', 'protocol', 'port', 'port_forward', 'rich_rule',
