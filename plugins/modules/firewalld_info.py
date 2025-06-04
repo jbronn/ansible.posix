@@ -237,12 +237,20 @@ def get_active_zones(client):
     return client.getActiveZones().keys()
 
 
+def get_all_passthroughs(client):
+    return client.getAllPassthroughs()
+
+
 def get_all_zones(client):
     return client.getZones()
 
 
 def get_default_zone(client):
     return client.getDefaultZone()
+
+
+def get_direct_rules(client):
+    return client.getAllRules()
 
 
 def get_zone_settings(client, zone):
@@ -310,9 +318,72 @@ def get_zone_ingress_priority(zone_settings):
     return zone_settings.getIngressPriority()
 
 
+# Policy functions supported on FirewallD 1.0.0+
+def get_active_policies(client):
+    return client.getActivePolicies().keys()
+
+
+def get_all_policies(client):
+    return client.getPolicies()
+
+
+def get_policy_settings(client, policy):
+    return client.getPolicySettings(policy)
+
+
+def get_policy_priority(policy_settings):
+    return policy_settings.getPriority()
+
+
+def get_policy_target(policy_settings):
+    return policy_settings.getTarget()
+
+
+def get_policy_services(policy_settings):
+    return policy_settings.getServices()
+
+
+def get_policy_ports(policy_settings):
+    return policy_settings.getPorts()
+
+
+def get_policy_protocols(policy_settings):
+    return policy_settings.getProtocols()
+
+
+def get_policy_masquerade(policy_settings):
+    return policy_settings.getMasquerade()
+
+
+def get_policy_forward_ports(policy_settings):
+    return policy_settings.getForwardPorts()
+
+
+def get_policy_source_ports(policy_settings):
+    return policy_settings.getSourcePorts()
+
+
+def get_policy_icmp_blocks(policy_settings):
+    return policy_settings.getIcmpBlocks()
+
+
+def get_policy_rich_rules(policy_settings):
+    return policy_settings.getRichRules()
+
+
+def get_policy_egress_zones(policy_settings):
+    return policy_settings.getEgressZones()
+
+
+def get_policy_ingress_zones(policy_settings):
+    return policy_settings.getIngressZones()
+
+
 def main():
     module_args = dict(
+        active_policies=dict(required=False, type='bool', default=False),
         active_zones=dict(required=False, type='bool', default=False),
+        policies=dict(required=False, type='list', elements='str'),
         zones=dict(required=False, type='list', elements='str'),
     )
 
@@ -324,9 +395,12 @@ def main():
     firewalld_info = dict()
     result = dict(
         changed=False,
+        active_policies=module.params['active_policies'],
         active_zones=module.params['active_zones'],
         collected_zones=list(),
         undefined_zones=list(),
+        collected_policies=list(),
+        undefined_policies=list(),
         warnings=list(),
     )
 
@@ -352,6 +426,49 @@ def main():
         # Gather general information of firewalld.
         firewalld_info['version'] = get_version()
         firewalld_info['default_zone'] = get_default_zone(client)
+        firewalld_info['direct_rules'] = get_direct_rules(client)
+        firewalld_info['passthroughs'] = get_all_passthroughs(client)
+
+        # Policies only supported in FirewallD 1.0.0+
+        if StrictVersion(firewalld_info['version']) >= StrictVersion('1.0.0'):
+            # Gather information for policies.
+            policies_info = dict()
+            collect_policies = list()
+            ignore_policies = list()
+            if module.params['active_policies']:
+                collect_policies = get_active_policies(client)
+            elif module.params['policies']:
+                all_policies = get_all_policies(client)
+                specified_policies = module.params['policies']
+                collect_policies = list(set(specified_policies) & set(all_policies))
+                ignore_policies = list(set(specified_policies) - set(collect_policies))
+                if ignore_policies:
+                    warn.append(
+                        'Please note: policy:(%s) have been ignored in the gathering process.' % ','.join(ignore_policies))
+            else:
+                collect_policies = get_all_policies(client)
+
+            for policy in collect_policies:
+                # Gather settings for each policy based on the output of
+                # 'firewall-cmd --info-policy=<POLICY>' command.
+                policy_info = dict()
+                policy_settings = get_policy_settings(client, policy)
+                policy_info['target'] = get_policy_target(policy_settings)
+                policy_info['priority'] = get_policy_priority(policy_settings)
+                policy_info['egress_zones'] = get_policy_egress_zones(policy_settings)
+                policy_info['ingress_zones'] = get_policy_ingress_zones(policy_settings)
+                policy_info['services'] = get_policy_services(policy_settings)
+                policy_info['ports'] = get_policy_ports(policy_settings)
+                policy_info['protocols'] = get_policy_protocols(policy_settings)
+                policy_info['masquerade'] = get_policy_masquerade(policy_settings)
+                policy_info['forward_ports'] = get_policy_forward_ports(policy_settings)
+                policy_info['source_ports'] = get_policy_source_ports(policy_settings)
+                policy_info['icmp_blocks'] = get_policy_icmp_blocks(policy_settings)
+                policy_info['rich_rules'] = get_policy_rich_rules(policy_settings)
+                policies_info[policy] = policy_info
+            firewalld_info['policies'] = policies_info
+            result['collected_policies'] = collect_policies
+            result['undefined_policies'] = ignore_policies
 
         # Gather information for zones.
         zones_info = dict()
